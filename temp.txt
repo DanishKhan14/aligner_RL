@@ -1,0 +1,1 @@
+Bacteroides_thetaiotaomicron	241:A>T,242:G>A

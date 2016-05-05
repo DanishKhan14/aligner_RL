@@ -3,6 +3,8 @@
 import os
 import sys
 import glob
+import subprocess
+
 
 opt = raw_input("Select an option: \n 1 - run aligner \n 2 - show results \n 3 - plot graph \n 4 - exit\n")
 
@@ -13,6 +15,14 @@ if opt not in ['1','2','3','4']:
 '''
 def runAligner():
     print "Running Bowtie Aligner \n"
+    fatqFile = raw_input("Enter the fstq file path...\n")
+    db = raw_input("Enter the community db file path...\n")
+    outfile = raw_input("Enter the output file path...\n")
+    print "Running Command:\n"
+    print "~/bowtie/bowtie-1.1.2$ ./bowtie -v 2 -a -m 3 --best --strata Community_db --suppress 1,2,4,5,6,7 fastqFile.fastq > outPutFile"
+
+    cmdList = ['bowtie','--strata',db,'--suppress','1,2,4,5,6,7',fastqFile,'>',outfile]    
+    subprocess.call(cmdList) 
 
 def showResults():
     print "Counts from given aligner results \n"

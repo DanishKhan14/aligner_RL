@@ -1,0 +1,41 @@
+1. Emulate this on cmdl:
+
+  418  ./bowtie-build Coredb Core_db
+  419  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM1.fastq > CM1.txt
+  420  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM2.fastq > CM2.txt
+  421  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM3.fastq > CM3.txt
+  422  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM4.fastq > CM4.txt
+  423  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM5.fastq > CM5.txt
+  424  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CM6.fastq > CM6.txt
+  425  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF1.fastq > CF1.txt
+  426  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF2.fastq > CF2.txt
+  427  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF3.fastq > CF3.txt
+  428  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF4.fastq > CF4.txt
+  429  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF5.fastq > CF5.txt
+  430  ./bowtie -v 2 -a -m 3 --best --strata Core_db --suppress 1,2,4,5,6,7 CF6.fastq > CF6.txt
+  431  ./bowtie-build CoreCs_db Core_Cs_db
+  432  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM1.fastq > CSM1.txt
+  433  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM2.fastq > CSM2.txt
+  434  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM3.fastq > CSM3.txt
+  435  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM4.fastq > CSM4.txt
+  436  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM5.fastq > CSM5.txt
+  437  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSM6.fastq > CSM6.txt
+  438  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF1.fastq > CSF1.txt
+  439  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF2.fastq > CSF2.txt
+  440  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF3.fastq > CSF3.txt
+  441  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF4.fastq > CSF4.txt
+  442  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF5.fastq > CSF5.txt
+  443  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF6.fastq > CSF6.txt
+  444  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF7.fastq > CSF7.txt
+  445  ./bowtie -v 2 -a -m 3 --best --strata Core_Cs_db --suppress 1,2,4,5,6,7 CSF8.fastq > CSF8.txt
+
+
+2. Concat Script: To concatenate all the sequences in the genome (.fna file)
+
+3. Create DB for the experiment (using multiple genomes)
+
+4. Run aligner with above DB and multiple fastq files
+
+5. Output results (org -> read count) for each fastq file in the experiment (One out.txt per input fastq file).
+
+6. Tailing statistics in a common file (# of reads, #matches, # of suppressed reads, time, etc.)

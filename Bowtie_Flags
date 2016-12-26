@@ -1,0 +1,93 @@
+Options
+
+Input
+
+-q The query input files (specified either as <m1> and <m2>, or as <s>) are FASTQ files (usually having extension .fq or .fastq). This is the default. See also: --solexa-quals and --integer-quals.
+
+-s/--skip <int> Skip (i.e. do not align) the first <int> reads or pairs in the input.
+
+-u/--qupto <int> Only align the first <int> reads or read pairs from the input (after the -s/--skip reads or pairs have been skipped). Default: no limit.
+
+-5/--trim5 <int> Trim <int> bases from high-quality (left) end of each read before alignment (default: 0).
+
+-3/--trim3 <int> Trim <int> bases from low-quality (right) end of each read before alignment (default: 0).
+
+--phred33-quals Input qualities are ASCII chars equal to the Phred quality plus 33. Default: on.
+
+--phred64-quals Input qualities are ASCII chars equal to the Phred quality plus 64. Default: off.
+
+
+Alignment
+
+-v <int> Report alignments with at most <int> mismatches. -e and -l options are ignored and quality values have no effect on what alignments are valid. -v is mutually exclusive with -n.
+
+-n/--seedmms <int> Maximum number of mismatches permitted in the "seed", i.e. the first L base pairs of the read (where L is set with -l/--seedlen). This may be 0, 1, 2 or 3 and the default is 2. This option is mutually exclusive with the -v option.
+
+-e/--maqerr <int> Maximum permitted total of quality values at all mismatched read positions throughout the entire alignment, not just in the "seed". The default is 70. Like Maq, bowtie rounds quality values to the nearest 10 and saturates at 30; rounding can be disabled with --nomaqround.
+
+-l/--seedlen <int> The "seed length"; i.e., the number of bases on the high-quality end of the read to which the -n ceiling applies. The lowest permitted setting is 5 and the default is 28. bowtie is faster for larger values of -l.
+
+--nomaqround Maq accepts quality values in the Phred quality scale, but internally rounds values to the nearest 10, with a maximum of 30. By default, bowtie also rounds this way. --nomaqround prevents this rounding in bowtie.
+
+
+--nofw/--norc If --nofw is specified, bowtie will not attempt to align against the forward reference strand. If --norc is specified, bowtie will not attempt to align against the reverse-complement reference strand. For paired-end reads using --fr or --rf modes, --nofw and --norc apply to the forward and reverse-complement pair orientations. I.e. specifying --nofw and --fr will only find reads in the R/F orientation where mate 2 occurs upstream of mate 1 with respect to the forward reference strand.
+
+--maxbts The maximum number of backtracks permitted when aligning a read in -n 2 or -n 3 mode (default: 125 without --best, 800 with --best). A "backtrack" is the introduction of a speculative substitution into the alignment. Without this limit, the default parameters will sometimes require that bowtie try 100s or 1,000s of backtracks to align a read, especially if the read has many low-quality bases and/or has no valid alignments, slowing bowtie down significantly. However, this limit may cause some valid alignments to be missed. Higher limits yield greater sensitivity at the expensive of longer running times. See also: -y/--tryhard.
+
+
+--chunkmbs <int> The number of megabytes of memory a given thread is given to store path descriptors in --best mode. Best-first search must keep track of many paths at once to ensure it is always extending the path with the lowest cumulative cost. Bowtie tries to minimize the memory impact of the descriptors, but they can still grow very large in some cases. If you receive an error message saying that chunk memory has been exhausted in --best mode, try adjusting this parameter up to dedicate more memory to the descriptors. Default: 64.
+Reporting
+
+-k <int> Report up to <int> valid alignments per read or pair (default: 1). Validity of alignments is determined by the alignment policy (combined effects of -n, -v, -l, and -e). If more than one valid alignment exists and the --best and --strata options are specified, then only those alignments belonging to the best alignment "stratum" will be reported. Bowtie is designed to be very fast for small -k but bowtie can become significantly slower as -k increases. If you would like to use Bowtie for larger values of -k, consider building an index with a denser suffix-array sample, i.e. specify a smaller -o/--offrate when invoking bowtie-build for the relevant index (see the Performance tuning section for details).
+
+-a/--all Report all valid alignments per read or pair (default: off). Validity of alignments is determined by the alignment policy (combined effects of -n, -v, -l, and -e). If more than one valid alignment exists and the --best and --strata options are specified, then only those alignments belonging to the best alignment "stratum" will be reported. Bowtie is designed to be very fast for small -k but bowtie can become significantly slower if -a/--all is specified. If you would like to use Bowtie with -a, consider building an index with a denser suffix-array sample, i.e. specify a smaller -o/--offrate when invoking bowtie-build for the relevant index (see the Performance tuning section for details).
+
+-m <int> Suppress all alignments for a particular read or pair if more than <int> reportable alignments exist for it. Reportable alignments are those that would be reported given the -n, -v, -l, -e, -k, -a, --best, and --strata options. Default: no limit. Bowtie is designed to be very fast for small -m but bowtie can become significantly slower for larger values of -m. If you would like to use Bowtie for larger values of -k, consider building an index with a denser suffix-array sample, i.e. specify a smaller -o/--offrate when invoking bowtie-build for the relevant index (see the Performance tuning section for details).
+
+-M <int> Behaves like -m except that if a read has more than <int> reportable alignments, one is reported at random. In default output mode, the selected alignment's 7th column is set to <int>+1 to indicate the read has at least <int>+1 valid alignments. In -S/--sam mode, the selected alignment is given a MAPQ (mapping quality) of 0 and the XM:I field is set to <int>+1. This option requires --best; if specified without --best, --best is enabled automatically.
+
+--best Make Bowtie guarantee that reported singleton alignments are "best" in terms of stratum (i.e. number of mismatches, or mismatches in the seed in the case of -n mode) and in terms of the quality values at the mismatched position(s). Stratum always trumps quality; e.g. a 1-mismatch alignment where the mismatched position has Phred quality 40 is preferred over a 2-mismatch alignment where the mismatched positions both have Phred quality 10. When --best is not specified, Bowtie may report alignments that are sub-optimal in terms of stratum and/or quality (though an effort is made to report the best alignment). --best mode also removes all strand bias. Note that --best does not affect which alignments are considered "valid" by bowtie, only which valid alignments are reported by bowtie. When --best is specified and multiple hits are allowed (via -k or -a), the alignments for a given read are guaranteed to appear in best-to-worst order in bowtie's output. bowtie is somewhat slower when --best is specified.
+
+--strata If many valid alignments exist and are reportable (e.g. are not disallowed via the -k option) and they fall into more than one alignment "stratum", report only those alignments that fall into the best stratum. By default, Bowtie reports all reportable alignments regardless of whether they fall into multiple strata. When --strata is specified, --best must also be specified.
+
+
+Output
+
+-B/--offbase <int> When outputting alignments in Bowtie format, consider the first base of a reference sequence to have offset <int>. This option has no effect in -S/--sam mode, since SAM mandates 1-based offsets. Default: 0.
+
+--quiet Print nothing besides alignments.
+
+--refout Write alignments to a set of files named refXXXXX.map, where XXXXX is the 0-padded index of the reference sequence aligned to. This can be a useful way to break up work for downstream analyses when dealing with, for example, large numbers of reads aligned to the assembled human genome. If <hits> is also specified, it will be ignored.
+
+--refidx When a reference sequence is referred to in a reported alignment, refer to it by 0-based index (its offset into the list of references that were indexed) rather than by name.
+
+--al <filename> Write all reads for which at least one alignment was reported to a file with name <filename>. Written reads will appear as they did in the input, without any of the trimming or translation of quality values that may have taken place within bowtie. Paired-end reads will be written to two parallel files with _1 and _2 inserted in the filename, e.g., if <filename> is aligned.fq, the #1 and #2 mates that align at least once will be written to aligned_1.fq and aligned_2.fq respectively.
+
+--un <filename> Write all reads that could not be aligned to a file with name <filename>. Written reads will appear as they did in the input, without any of the trimming or translation of quality values that may have taken place within Bowtie. Paired-end reads will be written to two parallel files with _1 and _2 inserted in the filename, e.g., if <filename> is unaligned.fq, the #1 and #2 mates that fail to align will be written to unaligned_1.fq and unaligned_2.fq respectively. Unless --max is also specified, reads with a number of valid alignments exceeding the limit set with the -m option are also written to <filename>.
+
+--max <filename> Write all reads with a number of valid alignments exceeding the limit set with the -m option to a file with name <filename>. Written reads will appear as they did in the input, without any of the trimming or translation of quality values that may have taken place within bowtie. Paired-end reads will be written to two parallel files with _1 and _2 inserted in the filename, e.g., if <filename> is max.fq, the #1 and #2 mates that exceed the -m limit will be written to max_1.fq and max_2.fq respectively. These reads are not written to the file specified with --un.
+
+--suppress <cols> Suppress columns of output in the default output mode. E.g. if --suppress 1,5,6 is specified, the read name, read sequence, and read quality fields will be omitted. See Default Bowtie output for field descriptions. This option is ignored if the output mode is -S/--sam.
+
+--fullref Print the full refernce sequence name, including whitespace, in alignment output. By default bowtie prints everything up to but not including the first whitespace.
+Colorspace
+
+
+Performance
+
+-o/--offrate <int> Override the offrate of the index with <int>. If <int> is greater than the offrate used to build the index, then some row markings are discarded when the index is read into memory. This reduces the memory footprint of the aligner but requires more time to calculate text offsets. <int> must be greater than the value used to build the index.
+
+-p/--threads <int> Launch <int> parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. Searching for alignments is highly parallel, and speedup is fairly close to linear. This option is only available if bowtie is linked with the pthreads library (i.e. if BOWTIE_PTHREADS=0 is not specified at build time).
+
+--mm Use memory-mapped I/O to load the index, rather than normal C file I/O. Memory-mapping the index allows many concurrent bowtie processes on the same computer to share the same memory image of the index (i.e. you pay the memory overhead just once). This facilitates memory-efficient parallelization of bowtie in situations where using -p is not possible.
+
+--shmem Use shared memory to load the index, rather than normal C file I/O. Using shared memory allows many concurrent bowtie processes on the same computer to share the same memory image of the index (i.e. you pay the memory overhead just once). This facilitates memory-efficient parallelization of bowtie in situations where using -p is not desirable. Unlike --mm, --shmem installs the index into shared memory permanently, or until the user deletes the shared memory chunks manually. See your operating system documentation for details on how to manually list and remove shared memory chunks (on Linux and Mac OS X, these commands are ipcs and ipcrm). You may also need to increase your OS's maximum shared-memory chunk size to accomodate larger indexes; see your OS documentation.
+Other
+
+--seed <int> Use <int> as the seed for pseudo-random number generator.
+
+--verbose Print verbose output (for debugging).
+
+--version Print version information and quit.
+
+-h/--help Print usage information and quit.

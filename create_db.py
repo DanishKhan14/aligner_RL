@@ -27,6 +27,9 @@ def main(argv):
     print "Creating combined database for entered genomes .... \n"
     createIndex(genomeFileList, indexName)
 
+    #Moved DB under indexes folder
+    cmdList = ['mv *.ebwt ./indexes/']
+    subprocess.call(cmdList, shell=True)
 
 def renameHeaders(fileList):
     #TODO: Might go pythonic way to make platform independent

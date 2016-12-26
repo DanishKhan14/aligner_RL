@@ -32,19 +32,28 @@ def main():
     db = args.database
     #db = argv[0]
     #for readFile in argv[1:]:
+    print "Running Bowtie Aligner "
+    print "./bowtie -v " + args.v + " -a -m "+ args.m +  " --best --strata Community_db --suppress 1,2,4,5,6,7 fastqFile.fastq\n"
+    
     for readFile in files:
         baseName = os.path.basename(readFile)
         outfile = "output/" + os.path.splitext(baseName)[0]+".csv"
         umfile = "unmatched/" + os.path.splitext(baseName)[0]+".txt"
         suppressfile = "suppressed/" + os.path.splitext(baseName)[0]+".txt"
-        runAligner(db, readFile, outfile, umfile, suppressfile)
-        print "Now running nomralization ... \n"
+        runAligner(db, readFile, outfile, umfile, suppressfile, args.m, args.v)
         normFactor = getNormalizationFactor(db)
-        formatOutput(outfile, normFactor)
+        formatOutput(outfile, normFactor, db)
+
+    #cmdList = ['for f in ./output/*.csv; do (cat "${f}"; echo) >> finalfile.csv; done']
+    #subprocess.call(cmdList)
 
 
-def formatOutput(fileName, normFactor):
-    wordCount = {}
+def formatOutput(fileName, normFactor, db):
+    #Get all genomes from the database
+    cmdList = ['./bowtie-inspect', db, '-n']
+    output = subprocess.check_output(cmdList)
+    
+    wordCount = dict([item,0] for item in output.split('\n')[:-1])
     f = open(fileName, 'r')
     for line in f.readlines():
         if line.split('\t')[0] not in wordCount:
@@ -59,6 +68,7 @@ def formatOutput(fileName, normFactor):
 
     with open(fileName, 'wb') as csv_file:
         writer = csv.writer(csv_file)
+        writer.writerow(fileName.replace('.csv',''))
         writer.writerow(['Genome','Raw Count','Norm Count','Fraction', 'Percentage'])
         for key, value in wordCount.items():
             normCount = value*normFactor[key]
@@ -79,15 +89,11 @@ def getNormalizationFactor(db):
     return normFactor
 
 
-def runAligner(index, readFile, outfile, umfile, suppressfile):
-    print "Running Bowtie Aligner \n"
+def runAligner(index, readFile, outfile, umfile, suppressfile, m, v):
     fatqFile = readFile
     f = open("stats/alignerStats.txt", "a")
     
-    print "Running Command:\n"
-    print "~/bowtie/bowtie-1.1.2/bowtie -v 2 -a -m 3 --best --strata Community_db --suppress 1,2,4,5,6,7 fastqFile.fastq > outPutFile"
-
-    cmdList = ['./bowtie', '-v', '2', '-a', '-m', '3', '--best', '--strata', '--un', umfile, '--max', suppressfile, index,'--suppress','1,2,4,5,6,7',fatqFile, outfile]    
+    cmdList = ['./bowtie', '-v', v, '-a', '-m', m, '--best', '--strata', '--un', umfile, '--max', suppressfile, index,'--suppress','1,2,4,5,6,7',fatqFile, outfile]    
     subprocess.call(cmdList, stdout=f)
     f.close()
 

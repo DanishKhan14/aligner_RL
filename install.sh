@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Installing COPRO-Seq Pipeline in current working directory ..."
 

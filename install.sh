@@ -16,6 +16,8 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
 fi
 
 cd bowtie
+mkdir output stats suppressed unmatched
+touch stats/alignerStats.txt
 
 if ! [[ -d ./aligner_RL ]]; then
     git clone https://github.com/DanishKhan14/aligner_RL.git
@@ -24,7 +26,4 @@ if ! [[ -d ./aligner_RL ]]; then
     cp ./aligner_RL/create_db.py ./
     exit;
 fi
-
-mkdir output stats suppressed unmatched
-
 

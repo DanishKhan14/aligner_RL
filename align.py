@@ -44,10 +44,6 @@ def main():
         normFactor = getNormalizationFactor(db)
         formatOutput(outfile, normFactor, db)
 
-    #cmdList = ['for f in ./output/*.csv; do (cat "${f}"; echo) >> finalfile.csv; done']
-    #subprocess.call(cmdList)
-
-
 def formatOutput(fileName, normFactor, db):
     #Get all genomes from the database
     cmdList = ['./bowtie-inspect', db, '-n']
@@ -68,8 +64,7 @@ def formatOutput(fileName, normFactor, db):
 
     with open(fileName, 'wb') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(fileName.replace('.csv',''))
-        writer.writerow(['Genome','Raw Count','Norm Count','Fraction', 'Percentage'])
+        writer.writerow([fileName.replace('.csv',''),'Raw Count','Norm Count','Fraction', 'Percentage'])
         for key, value in wordCount.items():
             normCount = value*normFactor[key]
             writer.writerow([key, value, normCount, normCount/totalNormCount, (normCount/totalNormCount)*100])
